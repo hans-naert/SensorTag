@@ -3,9 +3,13 @@ package be.vives.sensortag
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import be.vives.sensortag.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
+import java.util.jar.Attributes
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 private const val LOCATION_PERMISSION_REQUEST_CODE = 2
@@ -25,6 +30,50 @@ class MainActivity : AppCompatActivity() {
         bluetoothManager.adapter
     }
 
+    private val bleScanner by lazy {
+        bluetoothAdapter.bluetoothLeScanner
+    }
+
+    private val scanSettings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .build()
+
+    private val scanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            with(result.device) {
+                Log.i("ScanCallback", "Found BLE device Name: ${name ?: "Unnamed"}, address: $address")
+            }
+        }
+    }
+
+    private fun startBleScan() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isLocationPermissionGranted) {
+            requestLocationPermission()
+        } else {
+            bleScanner.startScan(null, scanSettings, scanCallback)
+            isScanning = true
+        }
+    }
+
+    private fun stopBleScan() {
+        bleScanner.stopScan(scanCallback)
+        isScanning = false
+    }
+
+    private var isScanning = false
+        set(value) {
+            field = value
+            runOnUiThread { binding.scanButton.text = if (value) "Stop Scan" else "Start Scan" }
+        }
+
+    val isLocationPermissionGranted
+        get() = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+
+    fun Context.hasPermission(permissionType: String): Boolean {
+        return ContextCompat.checkSelfPermission(this, permissionType) ==
+                PackageManager.PERMISSION_GRANTED
+    }
+
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,8 +83,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
         binding.scanButton.setOnClickListener {
             Toast.makeText(this,"Clicked on SCAN button", Toast.LENGTH_LONG).show()
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                requestLocationPermission();
+            if (isScanning) {
+                stopBleScan()
+            } else {
+                startBleScan()
+            }
         }
     }
 
