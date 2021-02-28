@@ -22,6 +22,8 @@ private const val LOCATION_PERMISSION_REQUEST_CODE = 2
 
 class MainActivity : AppCompatActivity() {
 
+    val deviceList= mutableListOf<Device>(Device("test","testaddress"),Device("test2","testaddress2"));
+
     private val bluetoothAdapter: BluetoothAdapter by lazy {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
@@ -39,11 +41,14 @@ class MainActivity : AppCompatActivity() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             with(result.device) {
                 Log.i("ScanCallback", "Found BLE device Name: ${name ?: "Unnamed"}, address: $address")
+                deviceList.add(Device(name?: "Unnamed",address))
+                runOnUiThread({ binding.devicesRecyclerView.adapter=DeviceAdapter(deviceList.toTypedArray())})
             }
         }
     }
 
     private fun startBleScan() {
+        deviceList.clear()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isLocationPermissionGranted) {
             requestLocationPermission()
         } else {
@@ -73,6 +78,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        binding.devicesRecyclerView.adapter=DeviceAdapter(deviceList.toTypedArray())
         binding.scanButton.setOnClickListener {
             Toast.makeText(this,"Clicked on SCAN button", Toast.LENGTH_LONG).show()
             if (isScanning) {
