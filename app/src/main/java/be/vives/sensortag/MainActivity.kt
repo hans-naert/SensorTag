@@ -42,9 +42,14 @@ class MainActivity : AppCompatActivity() {
             with(result.device) {
                 Log.i("ScanCallback", "Found BLE device Name: ${name ?: "Unnamed"}, address: $address")
                 deviceList.add(Device(name?: "Unnamed",address))
-                runOnUiThread({ binding.devicesRecyclerView.adapter=DeviceAdapter(deviceList.toTypedArray())})
+                runOnUiThread({ binding.devicesRecyclerView.adapter=DeviceAdapter(deviceList.toTypedArray(), deviceClicked)})
             }
         }
+    }
+
+    val deviceClicked = { device: Device ->
+
+        Toast.makeText(this, "Clicked on device Name: ${device.name ?: "Unnamed"}, address: ${device.address}",Toast.LENGTH_SHORT).show()
     }
 
     private fun startBleScan() {
@@ -78,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        binding.devicesRecyclerView.adapter=DeviceAdapter(deviceList.toTypedArray())
+        binding.devicesRecyclerView.adapter=DeviceAdapter(deviceList.toTypedArray(), deviceClicked)
         binding.scanButton.setOnClickListener {
             Toast.makeText(this,"Clicked on SCAN button", Toast.LENGTH_LONG).show()
             if (isScanning) {
