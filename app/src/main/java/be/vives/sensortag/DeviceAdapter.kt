@@ -5,28 +5,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import be.vives.sensortag.databinding.DeviceItemBinding
 
 class DeviceAdapter(val deviceList: List<Device>, val clickListener: (Device)->Unit) : RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>(){
 
     class DeviceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        private val device_name: TextView = itemView.findViewById(R.id.device_name_text_view)
-        private val address: TextView = itemView.findViewById(R.id.address_text_view)
 
-
-        fun bind(device: Device, clickListener: (Device)->Unit) {
-            device_name.text = device.name
-            address.text= device.address
+        fun bind(binding: DeviceItemBinding, device: Device, clickListener: (Device)->Unit) {
+            binding.deviceNameTextView.text = device.device.name?:"Unnamed"
+            binding.addressTextView.text= device.device.address
             itemView.setOnClickListener { clickListener(device)}
         }
     }
 
+    lateinit var binding: DeviceItemBinding
 
     // Returns a new ViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
-        val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.device_item, parent, false)
-
-        return DeviceViewHolder(view)
+        binding= DeviceItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        return DeviceViewHolder(binding.root)
     }
 
     // Returns size of data list
@@ -36,7 +33,7 @@ class DeviceAdapter(val deviceList: List<Device>, val clickListener: (Device)->U
 
     // Displays data at a certain position
     override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
-        holder.bind(deviceList[position], clickListener)
+        holder.bind(binding, deviceList[position], clickListener)
     }
 
 }

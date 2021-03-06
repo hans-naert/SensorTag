@@ -40,12 +40,11 @@ class MainActivity : AppCompatActivity() {
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            val indexQuery = deviceList.indexOfFirst { it.address == result.device.address }
-            if( indexQuery == -1)
-            {
+            val indexQuery = deviceList.indexOfFirst { it.device.address == result.device.address }
+            if (indexQuery == -1) {
                 with(result.device) {
                     Log.i("ScanCallback", "Found BLE device Name: ${name ?: "Unnamed"}, address: $address")
-                    deviceList.add(Device(this,name ?: "Unnamed", address))
+                    deviceList.add(Device(this/*, name ?: "Unnamed", address*/))
                     deviceAdapter.notifyItemInserted(deviceList.size - 1)
                 }
             }
@@ -54,11 +53,11 @@ class MainActivity : AppCompatActivity() {
 
     val deviceClicked = { device: Device ->
 
-        Toast.makeText(this, "Clicked on device Name: ${device.name ?: "Unnamed"}, address: ${device.address}",Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Clicked on device Name: ${device.device.name ?: "Unnamed"}, address: ${device.device.address}",Toast.LENGTH_SHORT).show()
         if(isScanning)
             stopBleScan()
         intent = Intent(this,DeviceActivity::class.java)
-        intent.putExtra("device",device.device)
+        intent.putExtra("device",device)
         startActivity(intent)
     }
 
