@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class DeviceAdapter(val deviceList: Array<Device>, val clickListener: (Device)->Unit) : RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>(){
+class DeviceAdapter(val deviceList: List<Device>, val clickListener: (Device)->Unit) : RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>(){
 
     class DeviceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val device_name: TextView = itemView.findViewById(R.id.device_name_text_view)

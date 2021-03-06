@@ -27,7 +27,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/device_name_text_view"
+            android:id="@+id/address_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -48,7 +48,7 @@
             app:layout_constraintTop_toBottomOf="@+id/device_name_label_text_view" />
 
         <TextView
-            android:id="@+id/address_text_view"
+            android:id="@+id/device_name_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

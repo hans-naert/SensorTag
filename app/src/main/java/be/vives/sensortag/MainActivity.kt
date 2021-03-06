@@ -2,6 +2,7 @@ package be.vives.sensortag
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -22,7 +23,7 @@ private const val LOCATION_PERMISSION_REQUEST_CODE = 2
 
 class MainActivity : AppCompatActivity() {
 
-    val deviceList= mutableListOf<Device>(Device("test","testaddress"),Device("test2","testaddress2"));
+    val deviceList= mutableListOf<Device>();
 
     private val bluetoothAdapter: BluetoothAdapter by lazy {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -39,10 +40,14 @@ class MainActivity : AppCompatActivity() {
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            with(result.device) {
-                Log.i("ScanCallback", "Found BLE device Name: ${name ?: "Unnamed"}, address: $address")
-                deviceList.add(Device(name?: "Unnamed",address))
-                runOnUiThread({ binding.devicesRecyclerView.adapter=DeviceAdapter(deviceList.toTypedArray(), deviceClicked)})
+            val indexQuery = deviceList.indexOfFirst { it.address == result.device.address }
+            if( indexQuery == -1)
+            {
+                with(result.device) {
+                    Log.i("ScanCallback", "Found BLE device Name: ${name ?: "Unnamed"}, address: $address")
+                    deviceList.add(Device(this,name ?: "Unnamed", address))
+                    deviceAdapter.notifyItemInserted(deviceList.size - 1)
+                }
             }
         }
     }
@@ -50,10 +55,16 @@ class MainActivity : AppCompatActivity() {
     val deviceClicked = { device: Device ->
 
         Toast.makeText(this, "Clicked on device Name: ${device.name ?: "Unnamed"}, address: ${device.address}",Toast.LENGTH_SHORT).show()
+        if(isScanning)
+            stopBleScan()
+        intent = Intent(this,DeviceActivity::class.java)
+        intent.putExtra("device",device.device)
+        startActivity(intent)
     }
 
     private fun startBleScan() {
         deviceList.clear()
+        deviceAdapter.notifyDataSetChanged()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isLocationPermissionGranted) {
             requestLocationPermission()
         } else {
@@ -77,13 +88,15 @@ class MainActivity : AppCompatActivity() {
         get() = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var deviceAdapter: DeviceAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        binding.devicesRecyclerView.adapter=DeviceAdapter(deviceList.toTypedArray(), deviceClicked)
+        deviceAdapter = DeviceAdapter(deviceList, deviceClicked)
+        binding.devicesRecyclerView.adapter=deviceAdapter
         binding.scanButton.setOnClickListener {
             Toast.makeText(this,"Clicked on SCAN button", Toast.LENGTH_LONG).show()
             if (isScanning) {
