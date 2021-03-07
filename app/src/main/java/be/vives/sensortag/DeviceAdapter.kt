@@ -3,7 +3,6 @@ package be.vives.sensortag
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import be.vives.sensortag.databinding.DeviceItemBinding
 
@@ -12,8 +11,8 @@ class DeviceAdapter(val deviceList: List<Device>, val clickListener: (Device)->U
     class DeviceViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
         fun bind(binding: DeviceItemBinding, device: Device, clickListener: (Device)->Unit) {
-            binding.deviceNameTextView.text = device.device.name?:"Unnamed"
-            binding.addressTextView.text= device.device.address
+            binding.deviceNameTextView.text = device.bluetoothDevice.name?:"Unnamed"
+            binding.addressTextView.text= device.bluetoothDevice.address
             itemView.setOnClickListener { clickListener(device)}
         }
     }

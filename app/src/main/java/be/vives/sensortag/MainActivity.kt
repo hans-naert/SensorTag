@@ -2,7 +2,6 @@ package be.vives.sensortag
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            val indexQuery = deviceList.indexOfFirst { it.device.address == result.device.address }
+            val indexQuery = deviceList.indexOfFirst { it.bluetoothDevice.address == result.device.address }
             if (indexQuery == -1) {
                 with(result.device) {
                     Log.i("ScanCallback", "Found BLE device Name: ${name ?: "Unnamed"}, address: $address")
@@ -53,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
     val deviceClicked = { device: Device ->
 
-        Toast.makeText(this, "Clicked on device Name: ${device.device.name ?: "Unnamed"}, address: ${device.device.address}",Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Clicked on device Name: ${device.bluetoothDevice.name ?: "Unnamed"}, address: ${device.bluetoothDevice.address}",Toast.LENGTH_SHORT).show()
         if(isScanning)
             stopBleScan()
         intent = Intent(this,DeviceActivity::class.java)

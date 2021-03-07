@@ -5,4 +5,4 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Device(val device: BluetoothDevice/*, val name: String, val address: String*/) :Parcelable
+data class Device(val bluetoothDevice: BluetoothDevice/*, val name: String, val address: String*/) :Parcelable
