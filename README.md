@@ -17,4 +17,4 @@ Application is gradually build-up
 12. add onclick on recyclerview items
 13. start a new activity when a device is selected
 14. viewbinding in recyclerviewer adapter
-15. read temoerature out of barometer characteristic
+15. read temperature out of barometer characteristic
