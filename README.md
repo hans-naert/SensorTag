@@ -1,6 +1,8 @@
 # SensorTag
 SensorTag android application
 
+Hierbij baseerde ik me op de volgende tutorial:  https://punchthrough.com/android-ble-guide/
+
 ## Commits
 Application is gradually build-up
 1. start from empty activity
